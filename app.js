@@ -63,27 +63,22 @@ export default function (express, bodyParser, createReadStream, crypto, http, mo
     }
 
     async function insert(req, res) {
-        console.error(req.body);
-        const {login, password, URL}=req.body;
-
-
-        try {
-          await m.connect(URL, { useNewUrlParser: true, useUnifiedTopology: true });
-        } catch (e) {
-          res.send(e.stack);
-          return;
+        req.set(CORS);
+        const {login,password,URL}=req.body;
+        const newUser = new User({login,password});
+        try{
+            await m.connect(URL, {useNewUrlParser:true, useUnifiedTopology:true});
+            try{
+                await newUser.save();
+                r.res.status(201).json({'Добавлено: ':login});
+            }
+            catch(e){
+                r.res.status(400).json({'Ошибка: ':'Нет пароля'});
+            }
         }
-
-        const newUser = new User({ login, password });
-
-        try {
-            await newUser.save();
-        } catch (e) {
-            res.send(e.stack);
-            return;
-        }
-        
-        res.status(201).json({ successsss: true, login });
+        catch(e){
+            console.log(e.codeName);
+        }  
     }
 
     app.get('/login/', login)
