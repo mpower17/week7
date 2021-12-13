@@ -64,17 +64,18 @@ export default function (express, bodyParser, createReadStream, crypto, http, mo
 
     async function insert(req, res) {
         res.set(CORS);
+        console.error(req.body);
         const {login,password,URL}=req.body;
         const newUser = new User({login,password});
         try{
             await m.connect(URL, {useNewUrlParser:true, useUnifiedTopology:true});
             try{
                 await newUser.save();
-                r.res.status(201).json({'Добавлено: ':login});
+                res.status(201).json({'Добавлено: ':login});
             }
             catch(e){
                 console.error(e);
-                r.res.status(400).json({'Ошибка: ':'Нет пароля'});
+                res.status(400).json({'Ошибка: ':'Нет пароля'});
             }
         }
         catch(e){
