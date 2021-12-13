@@ -61,7 +61,9 @@ export default function (express, bodyParser, createReadStream, crypto, http, mo
     }
 
     async function insert(req, res) {
+        console.error(req.body);
         const {login, password, URL}=req.body;
+
 
         try {
           await m.connect(URL, { useNewUrlParser: true, useUnifiedTopology: true });
