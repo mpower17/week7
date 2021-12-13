@@ -13,22 +13,27 @@ export default function (express, bodyParser, createReadStream, crypto, http, mo
 
     const User = mongoose.model('User', UserSchema);
 
-    app.use((req, res, next) => {
-        res.set('Access-Control-Allow-Origin', '*');
-        res.set('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,OPTIONS,DELETE');
-        res.set('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers, Accept');
-        res.set('Charset', 'text/plain; charset=UTF-8');
-        res.set('X-Author', 'itmo286434');
-        res.set('Content-Type', 'text/plain');
+    const CORS = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,OPTIONS,DELETE',
+        'Access-Control-Allow-Headers': 'Content-Type, Access-Control-Allow-Headers, Accept'
+      };
 
-        next();
-    })
+    const headersText = {
+        'Content-Type': 'text/plain; charset=UTF-8',
+        'Access-Control-Allow-Origin': '*',
+        'X-Author': login,
+        ...CORS,
+    };
+
 
     function login(req, res) {
+        res.set(CORS);
         res.send("itmo286434");
     }
 
-    async function code(request, response) {
+    async function code(req, res) {
+        res.set(CORS);
         const reader = createReadStream(import.meta.url.substring(7))
         reader.setEncoding('utf8')
         let result = ''
@@ -36,11 +41,13 @@ export default function (express, bodyParser, createReadStream, crypto, http, mo
         response.send(result)
     } 
 
-    function sha1(request, response) {
+    function sha1(req, res) {
+        res.set(CORS);
         response.send(crypto.createHash('sha1').update(request.params.input).digest('hex'))
     }
  
     function reqData(req, res) {
+        res.set(CORS);
         const url = req.query.addr || req.body
         let msg = ''
         if (url)
