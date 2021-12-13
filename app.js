@@ -63,7 +63,7 @@ export default function (express, bodyParser, createReadStream, crypto, http, mo
     }
 
     async function insert(req, res) {
-        req.set(CORS);
+        res.set(CORS);
         const {login,password,URL}=req.body;
         const newUser = new User({login,password});
         try{
