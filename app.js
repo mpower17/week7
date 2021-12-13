@@ -11,7 +11,7 @@ export default function (express, bodyParser, createReadStream, crypto, http, mo
     });
     
 
-    const user = new mongoose.model('User', schema);
+    const User = m.model('User', UserSchema);
 
     app.use((req, res, next) => {
         res.set('Access-Control-Allow-Origin', '*');
@@ -54,17 +54,16 @@ export default function (express, bodyParser, createReadStream, crypto, http, mo
     }
 
     async function insert(req, res) {
-        const {login, password, URL} = req.body;
-
-        try{
-            await m.connect(URL, {useNewUrlParser:true, useUnifiedTopology:true});
-        } catch(e) {
-            console.log(e.codeName);
+        const { URL, login, password } = req.body;
+        try {
+          await m.connect(URL, { useNewUrlParser: true, useUnifiedTopology: true });
+        } catch (e) {
+          res.send(e.stack);   
         }
-        
-        const newUser = new user({login, password});
+
+        const newUser = new User({ login, password });
         await newUser.save();
-        res.status(201).json({ login });
+        res.status(201).json({ successsss: true, login });
     }
 
     app.get('/login/', login)
