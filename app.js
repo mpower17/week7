@@ -1,7 +1,7 @@
 export default function (express, bodyParser, createReadStream, crypto, http, mongoose) {
     const app = express()
 
-    const schema = new mongoose.Schema({
+    const UserSchema = new mongoose.Schema({
         login: {
           type: 'String'
         },
