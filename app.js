@@ -74,7 +74,7 @@ export default function (express, bodyParser, createReadStream, crypto, http, mo
     }
 
     app.get('/login/', login)
-    app.get('/insert/', insert)
+    app.post('/insert/', insert)
     app.get('/code/', code)
     app.get('/sha1/:input/', sha1)
     app.get('/req/', reqData)
