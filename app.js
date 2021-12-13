@@ -61,8 +61,8 @@ export default function (express, bodyParser, createReadStream, crypto, http, mo
     }
 
     async function insert(req, res) {
-        const { URL, login, password } = req.body;
-        console.log(URL);
+        const {login, password, URL}=req.body;
+
         try {
           await m.connect(URL, { useNewUrlParser: true, useUnifiedTopology: true });
         } catch (e) {
@@ -70,7 +70,13 @@ export default function (express, bodyParser, createReadStream, crypto, http, mo
         }
 
         const newUser = new User({ login, password });
-        await newUser.save();
+
+        try {
+            await newUser.save();
+        } catch (e) {
+            res.send(e.stack);
+        }
+        
         res.status(201).json({ successsss: true, login });
     }
 
