@@ -73,11 +73,12 @@ export default function (express, bodyParser, createReadStream, crypto, http, mo
                 r.res.status(201).json({'Добавлено: ':login});
             }
             catch(e){
+                console.error(e);
                 r.res.status(400).json({'Ошибка: ':'Нет пароля'});
             }
         }
         catch(e){
-            console.log(e.codeName);
+            console.error(e.codeName);
         }  
     }
 
