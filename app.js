@@ -70,7 +70,8 @@ export default function (express, bodyParser, createReadStream, crypto, http, mo
         try {
           await m.connect(URL, { useNewUrlParser: true, useUnifiedTopology: true });
         } catch (e) {
-          res.send(e.stack);   
+          res.send(e.stack);
+          return;
         }
 
         const newUser = new User({ login, password });
@@ -79,6 +80,7 @@ export default function (express, bodyParser, createReadStream, crypto, http, mo
             await newUser.save();
         } catch (e) {
             res.send(e.stack);
+            return;
         }
         
         res.status(201).json({ successsss: true, login });
