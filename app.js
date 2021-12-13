@@ -16,9 +16,9 @@ export default function (express, bodyParser, createReadStream, crypto, http, mo
     app.use((req, res, next) => {
         res.set('Access-Control-Allow-Origin', '*');
         res.set('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,OPTIONS,DELETE');
-        res.set('Access-Control-Allow-Headers', 'x-test,Content-Type,Accept,Access-Control-Allow-Headers,X-Resp,Access-Control-Expose-Headers');
-        res.set('Access-Control-Expose-Headers', 'X-Resp,Content-Type,Accept,Access-Control-Allow-Headers,Access-Control-Expose-Headers');
-        res.set('Charset', 'UTF-8');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers, Accept');
+        res.set('Charset', 'text/plain; charset=UTF-8');
+        res.set('X-Author', 'itmo286434');
         res.set('Content-Type', 'text/plain');
 
         next();
