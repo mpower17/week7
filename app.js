@@ -11,7 +11,7 @@ export default function (express, bodyParser, createReadStream, crypto, http, mo
     });
     
 
-    const User = m.model('User', UserSchema);
+    const User = mongoose.model('User', UserSchema);
 
     app.use((req, res, next) => {
         res.set('Access-Control-Allow-Origin', '*');
