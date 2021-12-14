@@ -1,4 +1,4 @@
-export default function (express, bodyParser, createReadStream, crypto, http, m) {
+export default function (express, bodyParser, createReadStream, crypto, http, m, writeFileSync) {
     const app = express();
     const CORS = {
       'Access-Control-Allow-Origin': '*',
