@@ -1,7 +1,7 @@
 export default function (express, bodyParser, createReadStream, crypto, http, mongoose) {
     const app = express()
 
-    app.use(bodyParser.urlencoded({extended:true}));       
+    app.use(bodyParser.json());       
 
     const UserSchema = new mongoose.Schema({
         login: {
@@ -83,12 +83,53 @@ export default function (express, bodyParser, createReadStream, crypto, http, mo
         }  
     }
 
+    function wordpress(req, res) {
+        res.set(CORS);
+        res.send({
+            id: 1,
+            title: {
+                rendered: login
+            }
+        });
+    }
+
+    function wordpressPost(req, res) {
+        res.set(CORS).send({
+            id: 1,
+            title: {
+                rendered: login
+            }
+        });
+    }
+
+    async function render(req, res) {
+        res.set(CORS);
+        res.set(headersText);
+        const { addr } = req.query;
+        const { random2, random3 } = req.body;
+        const r2 = req.body.random2;
+        
+        
+        console.log(random2);
+
+        http.get(addr, (r, body = '') => {
+          r.on('data', (data) => (body += data)).on('end', () => {
+            writeFileSync('views/render.pug', body);
+            res.render('render', { login: login, random2, random3 });
+          });
+        });
+    }
+
+
     app.get('/login/', login)
     app.post('/insert/', insert)
     app.get('/code/', code)
     app.get('/sha1/:input/', sha1)
     app.get('/req/', reqData)
     app.post('/req/', reqData)
+    app.post('/wordpress/', wordpress)
+    app.post('/wordpress/wp-json/wp/v2/posts/1', wordpressPost)
+    app.post('/render/', render)
     app.all('*', login)
  
     return app
