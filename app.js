@@ -1,108 +1,91 @@
 export default function (express, bodyParser, createReadStream, crypto, http, mongoose) {
-    const app = express()
-
-    app.use(bodyParser.json());       
-
-    const UserSchema = new mongoose.Schema({
-        login: {
-          type: 'String'
-        },
-        password: {
-          type: 'String'
-        }
-    });
-    
-
-    const User = mongoose.model('User', UserSchema);
-
+    const app = express();
     const CORS = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,OPTIONS,DELETE',
-        'Access-Control-Allow-Headers': 'Content-Type, Access-Control-Allow-Headers, Accept'
-      };
-
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,OPTIONS,DELETE',
+      'Access-Control-Allow-Headers': 'Content-Type, Access-Control-Allow-Headers, Accept'
+    };
+    const login = 'itmo286434';
+    const User = m.model('User', UserSchema);
     const headersText = {
         'Content-Type': 'text/plain; charset=UTF-8',
         'Access-Control-Allow-Origin': '*',
         'X-Author': login,
         ...CORS,
     };
-
-
-    function login(req, res) {
+    
+    app
+    .all('/login/', (req, res) => {
         res.set(CORS);
-        res.send("itmo286434");
-    }
-
-    async function code(req, res) {
+        res.send(login);
+        })
+    
+    .all('/code/', (req, res) => {
         res.set(CORS);
-        const reader = createReadStream(import.meta.url.substring(7))
-        reader.setEncoding('utf8')
-        let result = ''
-        for await (const chunk of reader) result += chunk
-        response.send(result)
-    } 
-
-    function sha1(req, res) {
+        const path = import.meta.url.substring(7);
+        createReadStream(path).pipe(res);
+        })
+    .all('/sha1/:input/', (req, res) => {
         res.set(CORS);
-        response.send(crypto.createHash('sha1').update(request.params.input).digest('hex'))
-    }
- 
-    function reqData(req, res) {
+        const hash_sha1 = crypto.createHash('sha1')
+        .update(req.params.input)
+        .digest('hex')
+        res.send(hash_sha1);
+        })
+    
+    .use(bodyParser.urlencoded({extended: true}))
+    
+    .all('/req/', (req, res) => {
         res.set(CORS);
-        const url = req.query.addr || req.body
-        let msg = ''
-        if (url)
-            http.get(url, {headers: {'Content-Type': 'text/plain'}}, response => {
-                response.setEncoding('utf8')
-                response.on('data', chunk => msg += chunk)
-                response.on('end', () => res.send(msg))
-            })
-        else
-            res.send('Не удалось получить данные по URL')
-    }
-
-    async function insert(req, res) {
-        res.set(CORS);
-        console.error(req.body);
-        const {login,password,URL}=req.body;
-        const newUser = new User({login,password});
-        try{
-            await m.connect(URL, {useNewUrlParser:true, useUnifiedTopology:true});
-            try{
-                await newUser.save();
-                res.status(201).json({'Добавлено: ':login});
+        if (req.method === "GET" || req.method === "POST") {
+            const address = req.method === "GET" ? req.query.addr : req.body.addr;
+            if (address) {
+               http.get(address, (resp) => {
+                let data = '';
+                resp.on('data', (chunk) => { data += chunk; });
+                  resp.on('end', () => {
+                      res.send(data);
+                  });
+                }) 
             }
-            catch(e){
-                console.error(e);
-                res.status(400).json({'Ошибка: ':'Нет пароля'});
+            else {
+                res.send(login);
             }
         }
-        catch(e){
-            console.error(e.codeName);
-        }  
-    }
+        else {
+            res.send(login);
+        }
+        })
+    .post('/insert/', async (req, res) => {
+        const { URL, login, password } = req.body;
+        try {
+          await m.connect(URL, { useNewUrlParser: true, useUnifiedTopology: true });
+        } catch (e) {
+          res.send(e.stack);   
+        }
 
-    function wordpress(req, res) {
-        res.set(CORS);
-        res.send({
+        const newUser = new User({ login, password });
+        await newUser.save();
+        res.status(201).json({ successsss: true, login });
+    })
+    .all('/wordpress/', (r) => {
+        r.res.set(CORS).send({
             id: 1,
             title: {
                 rendered: login
             }
-        });
-    }
-
-    function wordpressPost(req, res) {
-        res.set(CORS).send({
+        })
+    })
+    .all('/wordpress/wp-json/wp/v2/posts/1', (r) => {
+        r.res.set(CORS).send({
             id: 1,
             title: {
                 rendered: login
             }
-        });
-    }
-
-    async function render(req, res) {
+        })
+    })
+    .use(bodyParser.json())
+    .all('/render/', async (req, res) => {
         res.set(CORS);
         res.set(headersText);
         const { addr } = req.query;
@@ -114,23 +97,15 @@ export default function (express, bodyParser, createReadStream, crypto, http, mo
 
         http.get(addr, (r, body = '') => {
           r.on('data', (data) => (body += data)).on('end', () => {
-            writeFileSync('view/render.pug', body);
+            writeFileSync('views/render.pug', body);
             res.render('render', { login: login, random2, random3 });
           });
         });
-    }
-
-
-    app.get('/login/', login)
-    app.post('/insert/', insert)
-    app.get('/code/', code)
-    app.get('/sha1/:input/', sha1)
-    app.get('/req/', reqData)
-    app.post('/req/', reqData)
-    app.all('/wordpress/', wordpress)
-    app.all('/wordpress/wp-json/wp/v2/posts/1', wordpressPost)
-    app.all('/render/', render)
-    app.all('*', login)
- 
-    return app
+      })
+    .all('/*', (req, res) => {
+        res.set(CORS);
+        res.send(login);
+        })
+    .set('view engine', 'pug');
+   return app; 
 }
