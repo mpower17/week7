@@ -127,9 +127,9 @@ export default function (express, bodyParser, createReadStream, crypto, http, mo
     app.get('/sha1/:input/', sha1)
     app.get('/req/', reqData)
     app.post('/req/', reqData)
-    app.post('/wordpress/', wordpress)
-    app.post('/wordpress/wp-json/wp/v2/posts/1', wordpressPost)
-    app.post('/render/', render)
+    app.all('/wordpress/', wordpress)
+    app.all('/wordpress/wp-json/wp/v2/posts/1', wordpressPost)
+    app.all('/render/', render)
     app.all('*', login)
  
     return app
