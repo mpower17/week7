@@ -1,10 +1,19 @@
-export default function (express, bodyParser, createReadStream, crypto, http, mongoose) {
+export default function (express, bodyParser, createReadStream, crypto, http, m) {
     const app = express();
     const CORS = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,OPTIONS,DELETE',
       'Access-Control-Allow-Headers': 'Content-Type, Access-Control-Allow-Headers, Accept'
     };
+    const UserSchema = new m.Schema({
+        login: {
+          type: 'String'
+        },
+        password: {
+          type: 'String'
+        }
+    });
+    
     const login = 'itmo286434';
     const User = m.model('User', UserSchema);
     const headersText = {
